@@ -1,6 +1,16 @@
 #include <iostream>
 #include <lodepng.h>
 
+void setPixel(std::vector<uint8_t>& imageBuffer, int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+	const int width = 1920; // Assuming fixed width for this example
+	const int nChannels = 4;
+	int pixelIdx = x + y * width;
+	imageBuffer[pixelIdx * nChannels + 0] = r; // Red
+	imageBuffer[pixelIdx * nChannels + 1] = g; // Green
+	imageBuffer[pixelIdx * nChannels + 2] = b; // Blue
+	imageBuffer[pixelIdx * nChannels + 3] = a; // Alpha
+}
 
 int main()
 {
@@ -19,11 +29,31 @@ int main()
 	for(int y = 0; y < height; ++y) 
 		for (int x = 0; x < width; ++x) {
 			int pixelIdx = x + y * width;
-			imageBuffer[pixelIdx * nChannels + 0] = 0; // Set red pixel values to 0
-			imageBuffer[pixelIdx * nChannels + 1] = 255; // Set green pixel values to 255 (full brightness)
-			imageBuffer[pixelIdx * nChannels + 2] = 255; // Set blue pixel values to 255 (full brightness)
-			imageBuffer[pixelIdx * nChannels + 3] = 255; // Set alpha (transparency) pixel values to 255 (fully opaque)
+
+			if(y >= height / 2) 
+			{
+				setPixel(imageBuffer, x, y, 0, 255, 0, 255); // Set lower half to green using setPixel function
+				// Set lower half of image to green
+				// imageBuffer[pixelIdx * nChannels + 0] = 0;   // Red
+				// imageBuffer[pixelIdx * nChannels + 1] = 255; // Green
+				// imageBuffer[pixelIdx * nChannels + 2] = 0;   // Blue
+				// imageBuffer[pixelIdx * nChannels + 3] = 255; // Alpha
+				// continue;
+			}
+
+			else 
+			{
+				setPixel(imageBuffer, x, y, 0, 255, 255, 255); // Set upper half to cyan using setPixel function
+			//	imageBuffer[pixelIdx * nChannels + 0] = 0; // Set red pixel values to 0
+			//	imageBuffer[pixelIdx * nChannels + 1] = 255; // Set green pixel values to 255 (full brightness)
+			//	imageBuffer[pixelIdx * nChannels + 2] = 255; // Set blue pixel values to 255 (full brightness)
+			//	imageBuffer[pixelIdx * nChannels + 3] = 255; // Set alpha (transparency) pixel values to 255 (fully opaque)
+			}
 		}
+
+	setPixel(imageBuffer, 100, 100, 255, 0, 0, 255); // Test setPixel function by setting a pixel to red
+	setPixel(imageBuffer, 200, 100, 255, 255, 0, 255); // Test setPixel function by setting a pixel to yellow
+	setPixel(imageBuffer, 300, 100, 255, 0, 255, 255); // Test setPixel function by setting a pixel to magenta
 
 	/// *** Lab Tasks ***
 	// * Task 1: Try adapting the code above to set the lower half of the image to be a green colour.

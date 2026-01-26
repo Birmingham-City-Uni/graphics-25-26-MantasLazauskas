@@ -23,7 +23,7 @@ int main()
 		for (int x = 0; x < width; ++x) 
 			for (int c = 0; c < 3; ++c) {
 				int pixelIdx = x + y * width;
-				imageBuffer[pixelIdx * 4 + c] *= 0.5;
+				imageBuffer[pixelIdx * 4 + c] = 255 - imageBuffer[pixelIdx * 4 + c];
 			}
 
 	// Once you have tested this code, comment out the for loops above and try the following tasks:
