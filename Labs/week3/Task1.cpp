@@ -32,20 +32,26 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 	// (that is, find minX, minY and maxX, maxY that are the min and max x and y-coordinates present in the triangle)
 	// You can use the std::min and std::max functions if you wish.
 	
-	// YOUR CODE HERE
-	int minX = 0, minY = 0, maxX = 0, maxY = 0;
+	int minX = std::min({p0.x(), p1.x(), p2.x()});
+	int minY = std::min({p0.y(), p1.y(), p2.y()});
+	int maxX = std::max({p0.x(), p1.x(), p2.x()});
+	int maxY = std::max({p0.y(), p1.y(), p2.y()});
 
 	// Check your minX, minY, maxX and maxY values don't lie outside the image!
 	// This would cause errors if you attempt to draw there.
 	// That is, clamp these values so that 0 <= x < width and 0 <= y < height.
 
-	// YOUR CODE HERE
+	minX = std::max(0, minX);
+	minY = std::max(0, minY);
+	maxX = std::min(width - 1, maxX);
+	maxY = std::min(height - 1, maxY);
 
 	// Find vectors going along two edges of the triangle
 	// from p0 to p1, and from p1 to p2.
 
 	// YOUR CODE HERE
-	Vector2 edge1, edge2;
+	Vector2 edge1 = p1 - p0;
+	Vector2 edge2 = p2 - p1;
 
 	// Find the area of the triangle using a cross product.
 	// Optional: You can use the sign of the cross product to see if this triangle is facing towards
@@ -53,8 +59,13 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 	// the quality of your render. (Note this optional feature is backface culling, one of the requirements
 	// for your coursework!)
 
-	// YOUR CODE HERE
-	float triangleArea = 0.0f;
+	float triangleArea = edge1.cross(p2 - p0);
+
+	if (triangleArea <= 0) 
+	{
+		// This triangle is back-facing, so skip it.
+		return;
+	}
 
 	// Now let's actually draw the triangle!
 	// We'll do a for loop over all pixels in the bounding box.
@@ -66,22 +77,24 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 			Vector2 p(x, y); // This is the 2D location of the pixel we are drawing.
 
 			// Find the area of each of the three sub-triangles, using a cross product
-			// YOUR CODE HERE - set the value of these three area variables.
-			float a0;
-			float a1;
-			float a2;
+			float a0 = (p1 - p).cross(p2 - p);
+			float a1 = (p2 - p).cross(p0 - p);
+			float a2 = (p0 - p).cross(p1 - p);
 
 			// Find the barycentrics b0, b1, and b2 by dividing by triangle area.
-			// YOUR CODE HERE - do the division and find b0, b1, b2.
-			float b0;
-			float b1;
-			float b2;
+			float b0 = a0 / triangleArea;
+			float b1 = a1 / triangleArea;
+			float b2 = a2 / triangleArea;
 
 			// Check if the sum of b0, b1, b2 is bigger than 1 (or ideally a number just over 1 
 			// to account for numerical error).
 			// If it's bigger, skip to the next pixel as we are outside the triangle.
-			// YOUR CODE HERE
-			float sum;
+			float sum = b0 + b1 + b2;
+
+			if (sum > 1.01f) 
+			{
+				continue;
+			}
 
 			// Now we're sure we're inside the triangle, and we can draw this pixel!
 			setPixel(image, x, y, width, height, r, g, b, a);
@@ -134,7 +147,7 @@ int main()
 		}
 	}
 
-	//drawTriangle(imageBuffer, width, height, Vector2(10, 10), Vector2(100, 10), Vector2(10, 100), 255, 0, 0, 255);
+	// drawTriangle(imageBuffer, width, height, Vector2(10, 10), Vector2(100, 10), Vector2(10, 100), 255, 0, 0, 255);
 
 	for (const auto& face : faces) {
 		Vector2 p0(vertices[face[0]].x() * 250 + width / 2, -vertices[face[0]].y() * 250 + height / 2);
@@ -153,6 +166,11 @@ int main()
 		// Hint: Remember rand() returns an int, but we want our colour values to lie between 0 and 255.
 		// How can we make sure our random r, g, b values stick to the right range?
 
+		// uint8_t r = rand() % 256; // This will give us a random number between 0 and 255.
+		// uint8_t g = rand() % 256;
+		// uint8_t b = rand() % 256;
+		// drawTriangle(imageBuffer, width, height, p0, p1, p2, r, g, b, 255);
+
 		// Bunny 2: (Sort of) Diffuse Lighting Bunny
 		// For the final task we'll do a bit of a preview of session 5 on diffuse lighting.
 		// The idea here is that we colour each triangle according to how much it points towards the camera.
@@ -163,6 +181,36 @@ int main()
 		// Once you have your normal, take the dot product with (0,0,1). This will effectively measure how much
 		// the normal points down the positive z-axis.
 		// Use this value to set the brightness of the triangle (remember to scale it back to the [0,255] range).
+
+		// Get the 3d vertices of the face
+		Vector3 v0 = vertices[face[0]];
+		Vector3 v1 = vertices[face[1]];
+		Vector3 v2 = vertices[face[2]];
+
+		// Find twon edges of the triangle
+		Vector3 edge1 = v1 - v0;
+		Vector3 edge2 = v2 - v1;
+
+		// Calculate the normal using a cross product
+		Vector3 normal = edge1.cross(edge2);
+
+		// Nomralise the normal vector
+		normal = normal.normalized();
+
+		// Direction of the light
+		Vector3 lightDir(0, 0, 1);
+
+		// Calculate how much the triangle faces the camera
+		float brightness = normal.dot(lightDir);
+
+		// Clamp the brightness to the [0,1] range
+		brightness = std::max(0.0f, brightness);
+
+		// Scale to [0,255] range
+		uint8_t color = static_cast<uint8_t>(brightness * 255);
+
+		// Draw with diffuse lighting
+		drawTriangle(imageBuffer, width, height, p0, p1, p2, color, color, color, 255);
 	}
 
 
