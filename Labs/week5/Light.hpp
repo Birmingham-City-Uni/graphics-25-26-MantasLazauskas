@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <fstream>
+#include <stdexcept>
 
 /// <summary>
 /// Abstract class representing a light source.
@@ -68,9 +69,7 @@ public:
 	{
 		// This one should be quite easy - remember the intensity of an ambient
 		// light is the same everywhere!
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		return _intensity;
 	}
 
 	virtual Type getType() override
@@ -81,17 +80,13 @@ public:
 	virtual Eigen::Vector3f getDirection(const Eigen::Vector3f& surfaceLocation) override
 	{
 		// Ambient lights do not have a direction, so throw an error!
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		throw std::runtime_error("Ambient light has no direction.");
 	}
 
 	virtual Eigen::Vector3f getLightLocation() override
 	{
 		// Ambient lights do not have a location, so throw an error!
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		return _intensity;
 	}
 };
 
@@ -112,9 +107,7 @@ public:
 	{
 		// This one should also be quite easy - the intensity of an directional
 		// light is also the same everywhere!
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		return _intensity;
 	}
 
 	virtual Type getType() override
@@ -125,17 +118,13 @@ public:
 	virtual Eigen::Vector3f getDirection(const Eigen::Vector3f& surfaceLocation) override
 	{
 		// Directional lights *do* have a direction, so return it!
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		return _direction;
 	}
 
 	virtual Eigen::Vector3f getLightLocation() override
 	{
 		// Directional lights do not have a location, so throw an error!
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		throw std::runtime_error("Directional light has no location.");
 	}
 };	
 
@@ -162,9 +151,13 @@ public:
 		// Work out how far away the light is from the surface point
 		// Then multiply the intensity by 1/distance^2, following the inverse
 		// square law.
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		Eigen::Vector3f diff = surfaceLocation - _location;
+		float distanceSquared = diff.squaredNorm();
+
+		if (distanceSquared < 1e-6f)
+			distanceSquared = 1e-6f;
+
+		return _intensity / distanceSquared;
 	}
 
 	virtual Type getType() override
@@ -178,16 +171,13 @@ public:
 		// Now we need to find a vector from the light location to
 		// the surface location.
 		// Don't forget to normalize it!
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		Eigen::Vector3f dir = surfaceLocation - _location;
+		return dir.normalized();
 	}
 
 	virtual Eigen::Vector3f getLightLocation() override
 	{
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		return _location;
 	}
 };	
 
@@ -220,9 +210,22 @@ public:
 		// This tells you cos(theta) - if this is too low (less than cosAngle) 
 		// you're outside the spotlight cone and can just return 0.
 		// Otherwise, behave just like a point light!
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		Eigen::Vector3f toSurface = surfaceLocation - _location;
+		float distanceSquared = toSurface.squaredNorm();
+
+		if (distanceSquared < 1e-6f)
+			distanceSquared = 1e-6f;
+
+		Eigen::Vector3f dir = toSurface.normalized();
+
+		float cosTheta = dir.dot(_direction.normalized());
+
+		if (cosTheta < _cosAngle)
+		{
+			return Eigen::Vector3f::Zero();
+		}
+
+		return _intensity / distanceSquared;
 	}
 
 	virtual Type getType() override
@@ -233,16 +236,13 @@ public:
 	virtual Eigen::Vector3f getDirection(const Eigen::Vector3f& surfaceLocation) override
 	{
 		// This will be just like your point light code.
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		Eigen::Vector3f dir = surfaceLocation - _location;
+		return dir.normalized();
 	}
 
 	virtual Eigen::Vector3f getLightLocation() override
 	{
-		// *** YOUR CODE HERE ***
-		return Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
+		return _location;
 	}
 };	
 
