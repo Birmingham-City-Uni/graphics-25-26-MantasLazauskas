@@ -28,18 +28,24 @@ struct Triangle {
 };
 
 
-Eigen::Matrix4f projectionMatrix(int height, int width, float horzFov = 70.f*M_PI/180.f, float zFar = 10.f, float zNear = 0.1f)
+Eigen::Matrix4f projectionMatrix(int height, int width, float horzFov, float zFar, float zNear)
 {
 	// ========= Subtask 1: Make a Projection Matrix ========
-	// *** YOUR CODE HERE ***
+	float aspect = float(width) / float(height);
 
 	// Make a projection matrix following the formulation in the lecture slides, and using the provided parameters.
 	// First, work out vertical FoV based on the horizontal FoV:
-	float vertFov = 0.f;
 	// Now construct the matrix.
-	Eigen::Matrix4f projection;
+	float f = 1.0f / tanf(horzFov / 2.0f);
+	Eigen::Matrix4f projection = Eigen::Matrix4f::Zero();
+
+	projection(0, 0) = f;
+	projection(1, 1) = f * aspect;
+	projection(2, 2) = (zFar + zNear) / (zNear - zFar);
+	projection(2, 3) = (2.0f * zFar * zNear) / (zNear - zFar);
+	projection(3, 2) = -1.0f;
+
 	return projection;
-	// *** END YOUR CODE ***
 }
 
 void findScreenBoundingBox(const Triangle& t, int width, int height, int& minX, int& minY, int& maxX, int& maxY)
@@ -70,7 +76,7 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 	Eigen::Vector2f edge1 = v2(t.screen[2] - t.screen[0]);
 	Eigen::Vector2f edge2 = v2(t.screen[1] - t.screen[0]);
 	float triangleArea = 0.5f * vec2Cross(edge2, edge1);
-	if (triangleArea < 0) {
+	if (triangleArea <= 0) {
 		// Triangle is backfacing
 		// Exit and quit drawing!
 		return;
@@ -104,23 +110,28 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 			// HINT: If you have trouble with this task, note that I've added code to save the z buffer to
 			// zBuffer.png. This is encoded so further away objects are lighter in color. It should match
 			// the example_zBuffer.png image if your code is working!
-			// *** YOUR CODE HERE ***
 
 			// First, work out the depth of this location in screen space. 
 			// We saved the clip space z values in t.screen[0].z(), t.screen[1].z() and t.screen[2].z.
 			// Use barycentric interpolation on these to work out the depth of this pixel.
-			float depth = 0.f;
+			float depth = b0 * t.screen[0].z() + b1 * t.screen[1].z() + b2 * t.screen[2].z();
+
+			float normalizedDepth = (depth + 1.0f) / 2.0f; // assuming clip space z in [-1,1]
 
 			// Work out where to sample in the zBuffer. Remember the zBuffer has only one channel,
 			// so your index should be based on the pixel's x and y locations, and the width of the 
 			// z buffer only.
-			int depthIdx = 0;
+			int depthIdx = y * width + x;
 
 			// If your depth is bigger than the current depth, skip drawing this pixel.
 			// Otherwise, replace the zBuffer value at depthIdx with this depth.
-			// ADD YOUR OWN CODE TO DO THIS HERE
+			
+			// Depth test (smaller = closer)
+			if (normalizedDepth >= zBuffer[depthIdx])
+				continue;
 
-			// *** END YOUR CODE ***
+			// Update zBuffer
+			zBuffer[depthIdx] = normalizedDepth;
 
 			Eigen::Vector3f normP = t.norms[0] * b0 + t.norms[1] * b1 + t.norms[2] * b2;
 			normP.normalize();
@@ -130,33 +141,36 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 			// ========== Subtask 5: Texture Mapping ===========
 			// Here we'll actually implement the texture mapping! Follow the steps below, implementing each
 			// stage in turn.
-			// *** YOUR CODE HERE ***
 			// Add code to calculate the texture coordinates corresponding to P, texP.
 			// Use barycentric interpolation!
-			Eigen::Vector2f texP = Eigen::Vector2f::Zero();
+			Eigen::Vector2f texP = b0 * t.texs[0] + b1 * t.texs[1] + b2 * t.texs[2];
 
 			// Convert this coordinate to a point in texture space
 			// To do so, multiply by the texWidth and texHeight to get to the correct range.
 			// Don't forget to flip the y coordinates! 
-			int texR = 0;
-			int texC = 0;
+			int texC = int(texP.x() * texWidth);
+			int texR = int((1.0f - texP.y()) * texHeight);
+			
 			// Handle the case where texR or texC end up outside the image!
 			// There are different ways you could do this - for example using 
 			// the modulo (%) operator to wrap around, or clamping to the edges.
 			// Write your own code below to do this - once you're done you should be sure 
+			// Write your own code below to do this - once you're done you should be sure 
 			// that 0 <= texC < texWidth and 0 <= texR < texHeight.
+			texC = std::max(0, std::min(texC, texWidth - 1));
+			texR = std::max(0, std::min(texR, texHeight - 1));
 
 			// Get the value from the texture (hint: use the getPixel function on the albedoTexture).
-			Color texColor{ 255,255,255,255 };
+			Color texColor = getPixel(albedoTexture, texC, texR, texWidth, texHeight);
 
 			// Convert it into an Eigen::Vector3f as an albedo
 			// (Optional bonus task, if you checked out the slides on gamma correction:
 			// gamma correct this colour, so the texture doesn't appear overly bright.
 			// should you raise to the power 1/2.2, or 2.2?)
-			Eigen::Vector3f albedo = Eigen::Vector3f::Zero();
-
-			// *** END YOUR CODE ***
-
+			Eigen::Vector3f albedo;
+			albedo.x() = powf(texColor.r / 255.0f, 2.2f);
+			albedo.y() = powf(texColor.g / 255.0f, 2.2f);
+			albedo.z() = powf(texColor.b / 255.0f, 2.2f);
 
 			// ----- Lighting code ------
 			// Work out colour at this position.
@@ -228,7 +242,40 @@ void drawMesh(std::vector<unsigned char>& image,
 		t.verts[2] = (modelToWorld * vec3ToVec4(v2)).block<3, 1>(0, 0);
 
 		// ======= Subtask 2: The Transformation Chain ======
-		//*** YOUR CODE HERE ***
+		
+		// Clip space (before perspective divide)
+		Eigen::Vector4f vClip0 = worldToClip * vec3ToVec4(t.verts[0]);
+		Eigen::Vector4f vClip1 = worldToClip * vec3ToVec4(t.verts[1]);
+		Eigen::Vector4f vClip2 = worldToClip * vec3ToVec4(t.verts[2]);
+
+		vClip0 /= vClip0.w();
+		vClip1 /= vClip1.w();
+		vClip2 /= vClip2.w();
+
+		auto outsideClipCheck = [&](Eigen::Vector4f v) 
+			{
+				return (v.x() < -1 || v.x() > 1 || v.y() < -1 || v.y() > 1 || v.z() < -1 || v.z() > 1);
+			};
+
+		// Skip triangle if outside clip box
+		if (outsideClipBox(vClip0) && outsideClipBox(vClip1) && outsideClipBox(vClip2))
+			continue;
+
+		// Convert to screen space
+		auto toScreen = [&](Eigen::Vector4f v) {
+			float x = (v.x() + 1.0f) * 0.5f * width;
+			float y = (1.0f - (v.y() + 1.0f) * 0.5f) * height;  // flip Y
+			return Eigen::Vector3f(x, y, v.z());
+			};
+
+		t.screen[0] = toScreen(vClip0);
+		t.screen[1] = toScreen(vClip1);
+		t.screen[2] = toScreen(vClip2);
+
+		std::cout << "Screen coords: "
+			<< t.screen[0].x() << ", " << t.screen[0].y() << " | "
+			<< t.screen[1].x() << ", " << t.screen[1].y() << " | "
+			<< t.screen[2].x() << ", " << t.screen[2].y() << std::endl;
 		// We've worked out the vertices in *world* space above.
 		// You need to do the rest of the transformation chain!
 		// Work out the vClip vectors, which are the vectors in clip space
@@ -240,9 +287,6 @@ void drawMesh(std::vector<unsigned char>& image,
 
 		// Work out the clip space coordinates, by multiplying by worldToClip and doing the 
 		// perspective divide.
-		Eigen::Vector4f vClip0 = Eigen::Vector4f::Zero();
-		Eigen::Vector4f vClip1 = Eigen::Vector4f::Zero();
-		Eigen::Vector4f vClip2 = Eigen::Vector4f::Zero();
 
 		// Check that all 3 vertices are in the clip box (-1 to 1 in x, y and z) and if not,
 		// skip drawing this triangle.
@@ -251,10 +295,6 @@ void drawMesh(std::vector<unsigned char>& image,
 		// Work out the screen space coordinates based on the image height and width.
 		// Set the z component of each screen coordinate to be the clip-space z (for example
 		// t.screen[0].z() == vClip0.z());
-		t.screen[0] = Eigen::Vector3f::Zero();
-		t.screen[1] = Eigen::Vector3f::Zero();
-		t.screen[2] = Eigen::Vector3f::Zero();
-		// *** END YOUR CODE ***
 
 		// transform the normals (using the inverse transpose of the upper 3x3 block)
 		t.norms[0] = (modelToWorld.block<3, 3>(0, 0).inverse().transpose() * n0).normalized();
@@ -265,6 +305,30 @@ void drawMesh(std::vector<unsigned char>& image,
 		t.texs[1] = mesh.texs[mesh.tFaces[i][1]];
 		t.texs[2] = mesh.texs[mesh.tFaces[i][2]];
 
+		// Draw a simple triangle directly in screen space for testing
+		Triangle testTriangle;
+		testTriangle.screen = {
+			Eigen::Vector3f(100, 100, 0.5f),
+			Eigen::Vector3f(400, 100, 0.5f),
+			Eigen::Vector3f(250, 400, 0.5f)
+		};
+		testTriangle.verts = {
+			Eigen::Vector3f(0, 0, 0),
+			Eigen::Vector3f(0, 0, 0),
+			Eigen::Vector3f(0, 0, 0)
+		};
+		testTriangle.norms = {
+			Eigen::Vector3f(0, 0, 1),
+			Eigen::Vector3f(0, 0, 1),
+			Eigen::Vector3f(0, 0, 1)
+		};
+		testTriangle.texs = {
+			Eigen::Vector2f(0, 0),
+			Eigen::Vector2f(1, 0),
+			Eigen::Vector2f(0.5f, 1)
+		};
+
+		std::cout << "Drawing triangle\n";
 		drawTriangle(image, width, height, zBuffer, t, lights, albedoTexture, texWidth, texHeight);
 	}
 }
@@ -295,10 +359,9 @@ int main()
 
 	// ========== Subtask 3: Camera Matrices ========
 
-	// *** YOUR CODE HERE ***
 	// This makes the projection matrix, using the function you implemented. Once the code is working,
 	// try changing the FoV!
-	Eigen::Matrix4f projection = projectionMatrix(height, width);
+	Eigen::Matrix4f projection = projectionMatrix(height, width, 70.f * M_PI / 180.f, 10.f, 0.1f);
 
 	// This matrix rotates the camera, tilting it down, then translates it up to make it look down on the scene.
 	// Once your code is working, try changing this to move the camera around!
@@ -306,11 +369,9 @@ int main()
 
 	// The main important task = set up the worldToCamera and worldToClip matrices here!
 	// Set up worldToCamera, based on cameraToWorld above
-	Eigen::Matrix4f worldToCamera;
+	Eigen::Matrix4f worldToCamera = cameraToWorld.inverse();
 	// Set up worldToClip, using the projection and worldToCamera matrices
-	Eigen::Matrix4f worldToClip;
-
-	// *** END YOUR CODE ***
+	Eigen::Matrix4f worldToClip = projection * worldToCamera;
 
 	std::string bunnyFilename = "../models/stanford_bunny_texmapped.obj";
 
