@@ -36,6 +36,8 @@ Eigen::Matrix4f projectionMatrix(int height, int width, float horzFov, float zFa
 	// Make a projection matrix following the formulation in the lecture slides, and using the provided parameters.
 	// First, work out vertical FoV based on the horizontal FoV:
 	// Now construct the matrix.
+	float horzFov_deg = 70.0f; // starting with 70 degrees
+	float horzFov_rad = horzFov_deg * M_PI / 180.0f
 	float f = 1.0f / tanf(horzFov / 2.0f);
 	Eigen::Matrix4f projection = Eigen::Matrix4f::Zero();
 
@@ -361,7 +363,9 @@ int main()
 
 	// This makes the projection matrix, using the function you implemented. Once the code is working,
 	// try changing the FoV!
-	Eigen::Matrix4f projection = projectionMatrix(height, width, 70.f * M_PI / 180.f, 10.f, 0.1f);
+	float horzFov_deg = 70.0f;
+	float horzFov_rad = horzFov_deg * M_PI / 180.0f;
+	Eigen::Matrix4f projection = projectionMatrix(height, width, horzFov_rad, 10.f, 0.1f);
 
 	// This matrix rotates the camera, tilting it down, then translates it up to make it look down on the scene.
 	// Once your code is working, try changing this to move the camera around!
