@@ -101,35 +101,60 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 			}
 
 			// Subtask 6: Modify the interpolation of norms and world-space positions to be perspective-correct.
-			// *** YOUR CODE HERE ***
 			// This interpolation is currently just basic barycentric interpolation, which will cause issues!
 			// Replace with perspective-correct, following the steps below
 
 			// Get the depths from the camera-space position of the 3 corners.
-			float depth0 = 0.f, depth1 = 0.f, depth2 = 0.f;
+			float depth0 = t.cam[0].z();
+			float depth1 = t.cam[1].z();
+			float depth2 = t.cam[2].z();
+
+			// Clamp to avoid division by zero
+			depth0 = std::max(depth0, 1e-6f);
+			depth1 = std::max(depth1, 1e-6f);
+			depth2 = std::max(depth2, 1e-6f);
 			
 			// Work out the depth at the point P
 			float depthP = 0.f;
 
+			// Compute 1/z for each vertex
+			float invZ0 = 1.0f / depth0;
+			float invZ1 = 1.0f / depth1;
+			float invZ2 = 1.0f / depth2;
+
+			// Interpolated 1/z at pixel
+			float invZP = b0 * invZ0 + b1 * invZ1 + b2 * invZ2;
+
+			// Interpolate world position with perspective correction
+			Eigen::Vector3f wp0 = t.verts[0];
+			Eigen::Vector3f wp1 = t.verts[1];
+			Eigen::Vector3f wp2 = t.verts[2];
+
 			// Interpolate to find the world-space position of this pixel (correct this version to be 
 			// perspective-correct).
 			// Don't forget to multiply by depthP!
-			Eigen::Vector3f worldP = Eigen::Vector3f::Zero();
+			Eigen::Vector3f worldP = (wp0 * b0 * invZ0 + wp1 * b1 * invZ1 + wp2 * b2 * invZ2) * invZP;
+
+			// Interpolate normal with perspective correction
+			Eigen::Vector3f n0 = t.norms[0];
+			Eigen::Vector3f n1 = t.norms[1];
+			Eigen::Vector3f n2 = t.norms[2];
 
 			// Interpolate to find the normal of this pixel (correct this version to be 
 			// perspective-correct).
 			// Tip: you don't need to worry about multiplying by depthP - you'll normalise this anyway!
-			Eigen::Vector3f normP = Eigen::Vector3f::Zero();
+			Eigen::Vector3f normP = (n0 * b0 * invZ0 + n1 * b1 * invZ1 + n2 * b2 * invZ2) * invZP;
+			
+			normP.normalize();
 
 			// Interpolate to find the correct clip-space depth (correct this version to be perspective-correct)
 			// This won't make too much of a difference in this case, but technically this version does use slightly
 			// incorrect depths.
-			float depth = 0.f;
-			// *** END YOUR CODE ***
+			float clipDepth = (vClip0.z() * b0 + vClip1.z() * b1 + vClip2.z() * b2);
 
 			int depthIdx = static_cast<int>(p.x()) + static_cast<int>(p.y()) * width;
-			if (depth > zBuffer[depthIdx]) continue;
-			zBuffer[depthIdx] = depth;
+			if (clipDepth > zBuffer[depthIdx]) continue;
+			zBuffer[depthIdx] = clipDepth;
 
 
 			// Work out colour at this position.
