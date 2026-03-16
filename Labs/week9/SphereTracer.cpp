@@ -1,6 +1,8 @@
 // This define is necessary to get the M_PI constant.
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <cfloat>
+#include <stdexcept>
 
 #include <iostream>
 #include <lodepng.h>
@@ -72,54 +74,57 @@ struct Camera {
 bool raySphereIntersection(const Ray& ray, const Sphere& sphere, Vector3f& intersection, float& t, float minT=0.001f)
 {
 	// Task 1: Add Ray-Sphere intersection
-	// *** YOUR CODE HERE ***
 	// Find the intersection point between the ray and the sphere. 
 	// If an intersection exists, set the value of "intersection" and "t", and return true!
 	// If no intersection is found, or the value of t is below minT, return false.
 
-	// Steps:
-	// 1. Find the value of A, B and C from the lecture slides.
-	// 2. Find the value of the discriminant B^2 - 4AC
-	// 3. If the discriminant is less than 0, return false (no solutions).
-	// 4. Otherwise, find the two solutions for t (t1 and t2, for example).
-	// 5. Find the smallest solution for t that's bigger than minT.
-	//   a. If such a t exists, set the value of "intersection" and "t" and return true.
-	//   b. If no such t exists, return false.
+	// Solve ||O + tD - C||^2 = r^2
+	Vector3f oc = ray.origin - sphere.centre;
+	float A = ray.direction.dot(ray.direction);
+	float B = 2.f * ray.direction.dot(oc);
+	float C = oc.dot(oc) - sphere.radius * sphere.radius;
 
-	// Remove this existing code, that just always returns false.
-	return false;
-	// *** END YOUR CODE ***
+	float disc = B * B - 4.f * A * C;
+	if (disc < 0.f) return false;
+
+	float sqrtD = std::sqrt(disc);
+	float t0 = (-B - sqrtD) / (2.f * A);
+	float t1 = (-B + sqrtD) / (2.f * A);
+
+	// Choose the smallest t that is > minT
+	float chosenT = FLT_MAX;
+	if (t0 > minT) chosenT = t0;
+	if (t1 > minT && t1 < chosenT) chosenT = t1;
+
+	if (chosenT == FLT_MAX) return false;
+
+	t = chosenT;
+	intersection = ray.origin + ray.direction * t;
+	return true;
 } 
 
 Vector3f getSphereNormal(const Sphere& sphere, const Vector3f& location) {
 	// Task 2: Find the sphere normal
-	// *** YOUR CODE HERE ***
-	// Find the value of the normal to the sphere at the given location.
-	// This should only need one line of code!
-	// See the slides for more detail.
-	// 
-	// Remove this existing code that just returns 0.
-	return Vector3f::Zero();
-	// *** END YOUR CODE ***
+	// The normal at a point on a sphere is (location - centre) normalized.
+	return (location - sphere.centre).normalized();
 }
 
 bool refract(const Vector3f& incident, const Vector3f& norm, float eta, Vector3f& refracted)
 {
-	// *** YOUR CODE HERE ***
-	// Find the refracted ray! Set the refracted variable to equal the refracted direction.
-	// If a ray is refracted, return true. If Total Internal Reflection (TIR) occurs, return false.
-	// If you return false you don't need to set the value of "refracted"!
+	// Compute refraction using standard formula.
+	// incident: incoming (should be normalized)
+	// norm: surface normal (should be normalized and oriented so that dot(incident, norm) <= 0 for entering)
+	// eta: n1/n2
 
-
-	// Steps:
-	// 1. Find the value of the "k" from the lecture slides.
-	// 2. If k < 0, return false (TIR occurs).
-	// 3. Otherwise, find the refracted ray and return true.
-
-	// This existing code just always returns false.
-	// Remove it when you write your own code!
-	return false;
-	// *** END YOUR CODE
+	float cosi = -incident.dot(norm);
+	float k = 1.f - eta * eta * (1.f - cosi * cosi);
+	if (k < 0.f) {
+		// Total internal reflection
+		return false;
+	}
+	refracted = (eta * incident) + (eta * cosi - std::sqrt(k)) * norm;
+	refracted.normalize();
+	return true;
 }
 
 Vector3f traceRay(const Ray& ray, const std::vector<Sphere>& spheres, const std::vector<std::unique_ptr<Light>>& lights, int bounce=0)
@@ -173,30 +178,37 @@ Vector3f traceRay(const Ray& ray, const std::vector<Sphere>& spheres, const std:
 				bool inShadow = false;
 
 				// Task 9: Add shadow testing, trace and check it works!
-				// *** YOUR CODE HERE ***
-				// Add shadow testing to cast pixel-perfect shadows!
-				// I've found the direction from the light to the surface, and 
-				// set up an inShadow variable above. You should set this inShadow to true
-				// if you find a sphere is blocking the light from the surface.
+				// Add shadow testing to cast pixel-perfect shadows.
+				// Construct shadow ray from the hit point towards the light.
+				Ray shadowRay;
+				// lightDir is the incoming direction (from light to surface). For a shadow ray we want from
+				// surface towards the light: that's -lightDir.
+				shadowRay.direction = -lightDir;
+				// Offset origin slightly along the surface normal to avoid self-intersection.
+				Vector3f surfNormal = getSphereNormal(*hitSphere, hitIntersection);
+				shadowRay.origin = hitIntersection + surfNormal * 0.001f;
 
-				// The overall code will be similar to the sphere intersection code above, with a few 
-				// changes:
-				// 1. You don't need to keep track of the closest hit this time - the minute you find
-				//    a blocking object, exit the for loop early and set inShadow to true.
-				// 2. If the light is DIRECTIONAL, distance doesn't matter. If it's a POINT or SPOT light, 
-				//    things should only block the light source if the hit location is closer than the light.
-				// 3. Optional: should REFRACTIVE spheres cast shadows? Maybe ignore hits from REFRACTIVE spheres.
-				//              If you want to be really fancy, you could coefft-wise multiply by the colour of
-				//              the refractive sphere.
+				for (const Sphere& s : spheres) {
+					// Optional: ignore refractive spheres for simple shadows
+					if (s.material == Material::REFRACTIVE) continue;
 
-				// Steps:
-				// 1. Construct a shadow ray, from the hit location, pointing towards the light.
-				// 2. For loop over all the spheres, testing for intersection.
-				//		a. If there is a hit, check the sphere type isn't REFRACTIVE
-				//		b. If the light is DIRECTIONAL, the point is definitely in shadow
-				//      c. If it's not, compare the value of t to the distance from hitIntersection to the light
-				//			the point is only in shadow if the value of t is less than this distance.
-				// *** END YOUR CODE ***
+					float tShadow;
+					Vector3f shadowHit;
+					if (raySphereIntersection(shadowRay, s, shadowHit, tShadow)) {
+						if (light->getType() == Light::DIRECTIONAL) {
+							inShadow = true;
+							break;
+						}
+						else {
+							// For point/spot lights, only consider blocking if the object is closer than the light.
+							float distToLight = (light->getLightLocation() - hitIntersection).norm();
+							if (tShadow < distToLight) {
+								inShadow = true;
+								break;
+							}
+						}
+					}
+				}
 
 				// If we're in shadow, this light source doesn't contribute to the colour so continue to the next.
 				if (inShadow) continue;
@@ -212,18 +224,20 @@ Vector3f traceRay(const Ray& ray, const std::vector<Sphere>& spheres, const std:
 	}
 	else if (hitSphere->material == Material::MIRROR) {
 		// Task 4: Add mirror reflection
-		// *** YOUR CODE HERE ***
-		// 1. Find the reflected ray, and call traceRay again recursively
-		// 2. Return the resulting colour.
-		// Optional extra task: coefft-wise multiply this returned colour with this 
-		// sphere's own colour. This will allow you to simulate coloured mirrors.
-		// REMINDER: don't forget to increase the value of bounce by 1 when you call traceRay
-		// again recursively! This will make sure you don't exceed the maxBounces bounce count.
+		// Find the reflected ray, and call traceRay again recursively
+		Vector3f normal = getSphereNormal(*hitSphere, hitIntersection);
+		Vector3f dir = ray.direction.normalized();
+		Vector3f reflectedDir = dir - 2.f * dir.dot(normal) * normal;
+		reflectedDir.normalize();
 
-		// This existing code throws an error as mirror spheres haven't been implemented yet.
-		// Remove it when you've implemented mirrors!
-		throw std::runtime_error("Mirror material not implemented!");
-		//*** END YOUR CODE
+		Ray reflectedRay;
+		// Offset origin slightly along normal to avoid self intersection.
+		reflectedRay.origin = hitIntersection + normal * 0.001f;
+		reflectedRay.direction = reflectedDir;
+
+		Vector3f reflectedColour = traceRay(reflectedRay, spheres, lights, bounce + 1);
+		// Optional: coloured mirrors - coeff-wise multiply by sphere colour.
+		return coeffWiseMultiply(reflectedColour, hitSphere->colour);
 	}
 	else if (hitSphere->material == Material::REFRACTIVE) {
 		// I've handled a few fiddly bits of the refraction code for you here:
@@ -247,26 +261,34 @@ Vector3f traceRay(const Ray& ray, const std::vector<Sphere>& spheres, const std:
 		if (!enteringSphere) normal = -normal;
 
 		// Task 6: Add refraction
-		// *** YOUR CODE HERE ***
+		Vector3f refractedDir;
+		if (refract(ray.direction.normalized(), normal, eta, refractedDir)) {
+			// Successfully refracted
+			Ray refractedRay;
+			// Offset origin slightly along refracted direction to avoid self intersection
+			refractedRay.origin = hitIntersection + refractedDir * 0.001f;
+			refractedRay.direction = refractedDir;
 
-		// Remove this line when you've implemented refraction!
-		throw std::runtime_error("Mirror material not implemented!");
+			Vector3f refractedColour = traceRay(refractedRay, spheres, lights, bounce + 1);
+			// Optional: coloured glass
+			return coeffWiseMultiply(refractedColour, hitSphere->colour);
+		}
+		else {
+			// Total internal reflection - treat as mirror
+			Vector3f normalForReflect = normal; // already oriented correctly
+			Vector3f dir = ray.direction.normalized();
+			Vector3f reflectedDir = dir - 2.f * dir.dot(normalForReflect) * normalForReflect;
+			reflectedDir.normalize();
 
-		// Handle refraction, and total internal reflection!
-		// Steps:
-		// 1. Try to refract the incoming ray in the normal, using the value of eta calculated above.
-		// 2. If refract returns true:
-		//		a. Construct a refracted ray
-		//      b. Call traceRay to find the colour. Don't forget to use bounce+1!
-		//      c. Optional: Coefft-wise multiply the result with this hit sphere's colour (this will allow you to 
-		//         make coloured glass).
-		// 3. If refract returns false:
-		//      a. Total Internal Reflection has occured!
-		//      b. Find the reflected direction, and make a reflected ray.
-		//      c. Trace the reflected ray. Again, make sure to use bounce+1!
+			Ray reflectedRay;
+			reflectedRay.origin = hitIntersection + normalForReflect * 0.001f;
+			reflectedRay.direction = reflectedDir;
 
-		// *** END YOUR CODE ***
+			return traceRay(reflectedRay, spheres, lights, bounce + 1);
+		}
 	}
+	// Should not reach here, but return ambient as fallback.
+	return ambientColour;
 }
 
 int main()
