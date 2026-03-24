@@ -106,25 +106,32 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 			// Replace with perspective-correct, following the steps below
 
 			// Get the depths from the camera-space position of the 3 corners.
-			float depth0 = 0.f, depth1 = 0.f, depth2 = 0.f;
-			
-			// Work out the depth at the point P
-			float depthP = 0.f;
+			// (camera-space z equals the clip.w used before perspective divide)
+			const float EPS = 1e-8f;
+			float depth0 = t.cam[0].z();
+			float depth1 = t.cam[1].z();
+			float depth2 = t.cam[2].z();
 
-			// Interpolate to find the world-space position of this pixel (correct this version to be 
-			// perspective-correct).
-			// Don't forget to multiply by depthP!
-			Eigen::Vector3f worldP = Eigen::Vector3f::Zero();
+			// compute 1 / z (safe)
+			float w0 = 1.0f / (depth0 + EPS);
+			float w1 = 1.0f / (depth1 + EPS);
+			float w2 = 1.0f / (depth2 + EPS);
 
-			// Interpolate to find the normal of this pixel (correct this version to be 
-			// perspective-correct).
-			// Tip: you don't need to worry about multiplying by depthP - you'll normalise this anyway!
-			Eigen::Vector3f normP = Eigen::Vector3f::Zero();
+			// Work out the depth at the point P (perspective-correct interpolation)
+			float denom = b0 * w0 + b1 * w1 + b2 * w2;
+			if (denom <= EPS) continue; // degenerate / behind camera
+			float depthP = 1.0f / denom;
 
-			// Interpolate to find the correct clip-space depth (correct this version to be perspective-correct)
-			// This won't make too much of a difference in this case, but technically this version does use slightly
-			// incorrect depths.
-			float depth = 0.f;
+			// Interpolate to find the world-space position of this pixel (perspective-correct).
+			// worldP = (b0 * v0 * w0 + b1 * v1 * w1 + b2 * v2 * w2) / (b0*w0 + b1*w1 + b2*w2)
+			Eigen::Vector3f worldP = (t.verts[0] * (b0 * w0) + t.verts[1] * (b1 * w1) + t.verts[2] * (b2 * w2)) * depthP;
+
+			// Interpolate to find the normal of this pixel (perspective-correct), then normalize.
+			Eigen::Vector3f normP = (t.norms[0] * (b0 * w0) + t.norms[1] * (b1 * w1) + t.norms[2] * (b2 * w2)) * depthP;
+			normP.normalize();
+
+			// Interpolate to find the correct clip-space depth (perspective-correct).
+			float depth = (t.screen[0].z() * (b0 * w0) + t.screen[1].z() * (b1 * w1) + t.screen[2].z() * (b2 * w2)) * depthP;
 			// *** END YOUR CODE ***
 
 			int depthIdx = static_cast<int>(p.x()) + static_cast<int>(p.y()) * width;
@@ -229,7 +236,7 @@ void drawMesh(std::vector<unsigned char>& image,
 		t.cam[1] = (worldToCam * modelToWorld * vec3ToVec4(v1)).block<3, 1>(0, 0);
 		t.cam[2] = (worldToCam * modelToWorld * vec3ToVec4(v2)).block<3, 1>(0, 0);
 
-		// Work out the clip space coordinates, by multiplying by worldToClip and doing the 
+		// Work out the clip space coordinates, by multiplying to worldToClip and doing the 
 		// perspective divide.
 		Eigen::Vector4f vClip0 = camToClip * worldToCam * modelToWorld * vec3ToVec4(v0);
 		vClip0 /= vClip0.w();
