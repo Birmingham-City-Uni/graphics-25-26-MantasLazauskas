@@ -1,0 +1,11 @@
+Model Information:
+* title:	Fall of CyberTron: Metroplex
+* source:	https://sketchfab.com/3d-models/fall-of-cybertron-metroplex-8b9864031eff48c4bab046aec29203e2
+* author:	masoudnayab (https://sketchfab.com/masoudnayab)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Fall of CyberTron: Metroplex" (https://sketchfab.com/3d-models/fall-of-cybertron-metroplex-8b9864031eff48c4bab046aec29203e2) by masoudnayab (https://sketchfab.com/masoudnayab) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
