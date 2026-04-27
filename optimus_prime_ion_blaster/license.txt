@@ -1,0 +1,11 @@
+Model Information:
+* title:	Optimus Prime Ion Blaster
+* source:	https://sketchfab.com/3d-models/optimus-prime-ion-blaster-eeda9ad4965b4bc0a4197ab54c845d63
+* author:	MetalDoom (https://sketchfab.com/MetalDoom)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Optimus Prime Ion Blaster" (https://sketchfab.com/3d-models/optimus-prime-ion-blaster-eeda9ad4965b4bc0a4197ab54c845d63) by MetalDoom (https://sketchfab.com/MetalDoom) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
