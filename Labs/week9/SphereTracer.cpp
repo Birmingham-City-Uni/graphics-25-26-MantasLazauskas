@@ -21,8 +21,7 @@
 // Task 6: Add refraction
 // Task 7: Add a refractive sphere to your scene, and raytrace again!
 // Task 8: Look at the sphere intersection testing code here to prep for task 9.
-// Task 9: Add shadow testing, trace and check it works!
-//
+// Task 9: Add shadow testing, trace and check it works!//
 // At the end, you should have a result similar to example.png (assuming you haven't changed
 // the scene setup).
 // 
@@ -51,7 +50,7 @@ struct Ray {
 };
 
 enum Material {
-	DIFFUSE, MIRROR, REFRACTIVE
+	DIFFUSE, MIRROR, REFRACTIVE, BLINN_PHONG
 };
 
 struct Sphere {
@@ -62,7 +61,13 @@ struct Sphere {
 	// Material properties
 	Material material;
 	Vector3f colour;
+
+	// IOR for refractive spheres (kept here last so existing initialisers remain valid).
 	float ior; // Index of refraction (only used for refractive spheres).
+
+	// Additional Blinn-Phong parameters (optional; value-initialised if not provided).
+	Vector3f specular;
+	float shininess;
 };
 
 struct Camera {
@@ -222,6 +227,61 @@ Vector3f traceRay(const Ray& ray, const std::vector<Sphere>& spheres, const std:
 		}
 		return color;
 	}
+
+	// Blinn-Phong material: ambient + diffuse + specular
+	else if (hitSphere->material == Material::BLINN_PHONG) {
+		Vector3f color = Vector3f::Zero();
+
+		for (const auto& light : lights) {
+			if (light->getType() == Light::AMBIENT) {
+				color += coeffWiseMultiply(hitSphere->colour, light->getLightIntensity());
+			}
+			else {
+				Vector3f lightDir = light->getDirection(hitIntersection);
+				// shadow test (same as diffuse)
+				bool inShadow = false;
+				Ray shadowRay;
+				shadowRay.direction = -lightDir;
+				Vector3f surfNormal = getSphereNormal(*hitSphere, hitIntersection);
+				shadowRay.origin = hitIntersection + surfNormal * 0.001f;
+
+				for (const Sphere& s : spheres) {
+					if (s.material == Material::REFRACTIVE) continue;
+					float tShadow;
+					Vector3f shadowHit;
+					if (raySphereIntersection(shadowRay, s, shadowHit, tShadow)) {
+						if (light->getType() == Light::DIRECTIONAL) {
+							inShadow = true;
+							break;
+						} else {
+							float distToLight = (light->getLightLocation() - hitIntersection).norm();
+							if (tShadow < distToLight) {
+								inShadow = true;
+								break;
+							}
+						}
+					}
+				}
+				if (inShadow) continue;
+
+				Vector3f N = surfNormal;
+				Vector3f L = -lightDir;
+				L.normalize();
+				float diff = std::max(N.dot(L), 0.f);
+				Vector3f diffuse = hitSphere->colour * diff;
+
+				Vector3f V = -ray.direction.normalized();
+				Vector3f H = (L + V).normalized();
+				float specFactor = std::max(N.dot(H), 0.f);
+				float spec = powf(specFactor, hitSphere->shininess > 0.f ? hitSphere->shininess : 32.f);
+				Vector3f specular = hitSphere->specular * spec;
+
+				Vector3f combined = diffuse + specular;
+				color += coeffWiseMultiply(combined, light->getIntensityAt(hitIntersection));
+			}
+		}
+		return color;
+	}
 	else if (hitSphere->material == Material::MIRROR) {
 		// Task 4: Add mirror reflection
 		// Find the reflected ray, and call traceRay again recursively
@@ -322,10 +382,12 @@ int main()
 	spheres.push_back({ Vector3f(0.f, -2.f, 4.f), 0.5f, Material::DIFFUSE, Vector3f(0.2f, 0.2f, 0.8f) });
 	spheres.push_back({ Vector3f(0.f, 1.f, 6.f), 0.3f, Material::DIFFUSE, Vector3f(0.8f, 0.8f, 0.f) });
 	// Task 5: Add a mirror reflective sphere to your scene, and raytrace again!
-	//spheres.push_back({ Vector3f(2.f, 2.f, 4.f), 0.5f, Material::MIRROR, Vector3f(0.9f, 0.9f, 0.9f) });
+	spheres.push_back({ Vector3f(2.f, 2.f, 4.f), 0.5f, Material::MIRROR, Vector3f(0.9f, 0.9f, 0.9f) });
 	// Task 7: Add a refractive sphere to your scene, and raytrace again!
-	//spheres.push_back({ Vector3f(0.f, 0.f, 3.f), 0.5f, Material::REFRACTIVE, Vector3f(0.9f, 0.8f, 0.8f), 1.4f });
-
+	spheres.push_back({ Vector3f(0.f, 0.f, 3.f), 0.5f, Material::REFRACTIVE, Vector3f(0.9f, 0.8f, 0.8f), 1.4f });
+	// Bonus Task: Add (Blinn)-Phong shading as an extra material type!
+	spheres.push_back({ Vector3f(-1.5f, 1.5f, 4.f), 0.5f, Material::BLINN_PHONG, Vector3f(0.4f, 0.6f, 0.2f), 0.f, Vector3f(0.9f, 0.9f, 0.9f), 64.f });
+	
 	Camera camera{
 		Vector3f(0.f, 0.f, 0.f), // position
 		Vector3f(0.f, 0.f, 1.f), // direction
@@ -364,7 +426,6 @@ int main()
 			setPixel(imageBuffer, x, height-y-1, width, height, c);
 		}
 	
-
 
 	// Save the image to png.
 	int errorCode;

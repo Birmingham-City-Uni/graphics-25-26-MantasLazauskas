@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include <iostream>
+#include <iomanip>
 #include <lodepng.h>
 #include "Image.hpp"
 #include "LinAlg.hpp"
@@ -166,7 +167,7 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 
 
 
-void drawMesh(std::vector<unsigned char>& image,
+void drawMesh(std::vector<uint8_t>& image,
 	std::vector<float>& zBuffer,
 	const Mesh& mesh, 
 	const Eigen::Vector3f &albedo, const Eigen::Vector3f &specularColor,
@@ -223,6 +224,17 @@ void drawMesh(std::vector<unsigned char>& image,
 	}
 }
 
+
+static void clearImageAndZBuffer(std::vector<uint8_t>& image, std::vector<float>& zBuffer, int width, int height)
+{
+	Color black{ 0,0,0,255 };
+	for (int r = 0; r < height; ++r) {
+		for (int c = 0; c < width; ++c) {
+			setPixel(image, c, r, width, height, black);
+			zBuffer[r * width + c] = 1.0f;
+		}
+	}
+}
 
 int main()
 {
