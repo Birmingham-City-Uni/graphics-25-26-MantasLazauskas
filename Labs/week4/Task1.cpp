@@ -1,4 +1,3 @@
-// This define is necessary to get the M_PI constant.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -73,7 +72,7 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 		return;
 	}
 
-	for(int x = minX; x <= maxX; ++x) 
+	for (int x = minX; x <= maxX; ++x)
 		for (int y = minY; y <= maxY; ++y) {
 			Eigen::Vector2f p(x, y);
 
@@ -95,8 +94,8 @@ void drawTriangle(std::vector<uint8_t>& image, int width, int height,
 }
 
 
-void drawMesh(std::vector<unsigned char>& image, const Mesh& mesh, 
-	const Eigen::Vector3f& baseColor, const Eigen::Matrix4f& transform, 
+void drawMesh(std::vector<unsigned char>& image, const Mesh& mesh,
+	const Eigen::Vector3f& baseColor, const Eigen::Matrix4f& transform,
 	int width, int height)
 {
 	for (const auto& face : mesh.faces) {
@@ -130,8 +129,8 @@ void drawMesh(std::vector<unsigned char>& image, const Mesh& mesh,
 		Eigen::Vector2f p2(tv2.x() * 250 + width / 2, -tv2.y() * 250 + height / 2);
 
 
-		Eigen::Vector3f edge1 = tv1.block<3,1>(0,0) - tv0.block<3,1>(0,0);
-		Eigen::Vector3f edge2 = tv2.block<3,1>(0,0) - tv0.block<3,1>(0,0);
+		Eigen::Vector3f edge1 = tv1.block<3, 1>(0, 0) - tv0.block<3, 1>(0, 0);
+		Eigen::Vector3f edge2 = tv2.block<3, 1>(0, 0) - tv0.block<3, 1>(0, 0);
 		Eigen::Vector3f normal = edge1.cross(edge2).normalized();
 
 		float intensity = normal.dot(Eigen::Vector3f(0, 0, 1));
@@ -275,14 +274,14 @@ int main()
 
 	std::string outputFilename = "output.png";
 
-	const int width = 512, height = 512;
+	const int width = 1920, height = 1080;
 	const int nChannels = 4;
 
 	// Setting up an image buffer
 	// This std::vector has one 8-bit value for each pixel in each row and column of the image, and
 	// for each of the 4 channels (red, green, blue and alpha).
 	// Remember 8-bit unsigned values can range from 0 to 255.
-	std::vector<uint8_t> imageBuffer(height*width*nChannels);
+	std::vector<uint8_t> imageBuffer(height * width * nChannels);
 
 	// This line sets the memory block occupied by the image to all zeros.
 	memset(&imageBuffer[0], 0, width * height * nChannels * sizeof(uint8_t));
@@ -295,6 +294,11 @@ int main()
 	Mesh dragonMesh = loadMeshFile(dragonFilename);
 	Mesh kratosMesh = loadMeshFile(kratosFilename);
 
+	// ===== Added: load the Optimus Prime model =====
+	// Note: the repository contains the model files under the folder
+	// `fall_of_cybertron_optimus_prime`. If the .obj filename differs, update the path below.
+	std::string optimusFilename = "../models/optimus_prime.obj";
+	Mesh optimusMesh = loadMeshFile(optimusFilename);
 
 	// ============ TASK 3 =================
 	// *** Your Code Here ***
@@ -319,6 +323,11 @@ int main()
 		rotateYMatrix(0.0f) *
 		scaleMatrix(0.15f);
 
+	// ===== Added: Optimus transform (tweak values to taste) =====
+	Eigen::Matrix4f optimusTransform =
+		translationMatrix(Eigen::Vector3f(0.0f, -0.65f, 0.6f)) *
+		rotateYMatrix(M_PI / 8.0f) *
+		scaleMatrix(0.3f);
 
 	// =========== TASK 4 ==============
 	// Prepare your own mesh in blender, exporting as OBJ
@@ -328,6 +337,14 @@ int main()
 	drawMesh(imageBuffer, bunnyMesh, Eigen::Vector3f(0, 1, 0), bunnyTransform, width, height);
 	drawMesh(imageBuffer, dragonMesh, Eigen::Vector3f(0, 1, 1), dragonTransform, width, height);
 	drawMesh(imageBuffer, kratosMesh, Eigen::Vector3f(1, 0, 0), kratosTransform, width, height);
+
+	// ===== Draw the added Optimus Prime model =====
+	// Color here is an approximate base color for shading; tweak as needed.
+	drawMesh(imageBuffer, optimusMesh, Eigen::Vector3f(0.8f, 0.2f, 0.2f), optimusTransform, width, height);
+
+	// Credit required by the model license (CC-BY-4.0)
+	std::cout << "Model credit: \"Fall of Cyber Tron: Optimus Prime\" by masoudnayab (https://sketchfab.com/masoudnayab) licensed under CC-BY-4.0\n";
+	std::cout << "See: fall_of_cybertron_optimus_prime/license.txt\n";
 
 	// *** Encoding image data ***
 	// PNG files are compressed to save storage space. 

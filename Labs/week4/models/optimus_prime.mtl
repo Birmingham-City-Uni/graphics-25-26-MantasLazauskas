@@ -1,0 +1,98 @@
+# Blender 5.1.1 MTL File: 'pathtraced.blend'
+# www.blender.org
+
+newmtl Material_003
+Ns 12.500003
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Material_003_baseColor.png
+
+newmtl RB_Optimus_ArmLo_Mat
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_Optimus_ArmLo_Mat_baseColor.png
+map_Ke C:/RB_Optimus_ArmLo_Mat_emissive.png
+map_Bump -bm 1.000000 C:/RB_Optimus_ArmLo_Mat_normal.png
+
+newmtl RB_Optimus_ArmUp_Mat
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/RB_Optimus_ArmUp_Mat_baseColor.png
+map_Ke C:/RB_Optimus_ArmUp_Mat_emissive.png
+map_Bump -bm 1.000000 C:/RB_Optimus_ArmUp_Mat_normal.png
+
+newmtl RB_Optimus_Chest_Mat
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_Optimus_Chest_Mat_baseColor.png
+map_Ke C:/RB_Optimus_Chest_Mat_emissive.png
+map_Bump -bm 1.000000 C:/RB_Optimus_Chest_Mat_normal.png
+
+newmtl RB_Optimus_Head_Mat
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_Optimus_Head_Mat_baseColor.png
+map_Ke C:/RB_Optimus_Head_Mat_emissive.png
+map_Bump -bm 1.000000 C:/RB_Optimus_Head_Mat_normal.png
+
+newmtl RB_Optimus_LEgs_Mat
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_Optimus_LEgs_Mat_baseColor.png
+map_Ke C:/RB_Optimus_LEgs_Mat_emissive.png
+map_Bump -bm 1.000000 C:/RB_Optimus_LEgs_Mat_normal.png
+
+newmtl RB_Optimus_Wheel_Mat
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_Optimus_Wheel_Mat_baseColor.png
+map_Ke C:/RB_Optimus_Wheel_Mat_emissive.png
+map_Bump -bm 1.000000 C:/RB_Optimus_Wheel_Mat_normal.png
+
+newmtl TR_FactionLogo_Mat_INST
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+illum 3
+map_Kd C:/TR_FactionLogo_Mat_INST_baseColor.png
+map_Ke C:/TR_FactionLogo_Mat_INST_emissive.png
+map_d C:/TR_FactionLogo_Mat_INST_baseColor.png
+
+newmtl material001
+Ns 1.767767
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/material001_baseColor.png

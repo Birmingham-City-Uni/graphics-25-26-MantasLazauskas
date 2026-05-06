@@ -1,0 +1,78 @@
+# Blender 5.1.1 MTL File: 'pathtraced.blend'
+# www.blender.org
+
+newmtl RB_Metro_Greeble_Mat_INST.001
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_Metro_Greeble_Mat_INST_baseColor.png
+map_Bump -bm 1.000000 C:/RB_Metro_Greeble_Mat_INST_normal.png
+
+newmtl RB_MetroplexArmLo_MatInst.001
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_MetroplexArmLo_MatInst_baseColor.png
+map_Ke C:/RB_MetroplexArmLo_MatInst_emissive.png
+map_Bump -bm 1.000000 C:/RB_MetroplexArmLo_MatInst_normal.png
+
+newmtl RB_MetroplexArmUp_MatInst.001
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_MetroplexArmUp_MatInst_baseColor.png
+map_Ke C:/RB_MetroplexArmUp_MatInst_emissive.png
+map_Bump -bm 1.000000 C:/RB_MetroplexArmUp_MatInst_normal.png
+
+newmtl RB_MetroplexChest_MatInst.001
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_MetroplexChest_MatInst_baseColor.png
+map_Ke C:/RB_MetroplexChest_MatInst_emissive.png
+map_Bump -bm 1.000000 C:/RB_MetroplexChest_MatInst_normal.png
+
+newmtl RB_MetroplexHead_MatInst.001
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_MetroplexHead_MatInst_baseColor.png
+map_Ke C:/RB_MetroplexHead_MatInst_emissive.png
+map_Bump -bm 1.000000 C:/RB_MetroplexHead_MatInst_normal.png
+
+newmtl RB_MetroplexLegs_MatInst.001
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/RB_MetroplexLegs_MatInst_baseColor.png
+map_Ke C:/RB_MetroplexLegs_MatInst_emissive.png
+map_Bump -bm 1.000000 C:/RB_MetroplexLegs_MatInst_normal.png
+
+newmtl TR_FactionLogo_Mat_INST.003
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+illum 3
+map_Kd C:/TR_FactionLogo_Mat_INST_baseColor.png
+map_Ke C:/TR_FactionLogo_Mat_INST_emissive.png
+map_d C:/TR_FactionLogo_Mat_INST_baseColor.png

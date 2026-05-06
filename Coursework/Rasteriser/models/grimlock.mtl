@@ -1,0 +1,23 @@
+# Blender 5.1.1 MTL File: 'pathtraced.blend'
+# www.blender.org
+
+newmtl ALT_Grimlock_TEXSET_D
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/ALT_Grimlock_TEXSET_D_baseColor.png
+map_Ke C:/ALT_Grimlock_TEXSET_D_emissive.png
+map_Bump -bm 1.000000 C:/ALT_Grimlock_TEXSET_D_normal.png
+
+newmtl Logo_AUT_CLRv2
+Ns 562.500000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+illum 3
+map_Kd C:/Logo_AUT_CLRv2_baseColor.png
+map_Ke C:/Logo_AUT_CLRv2_emissive.png
+map_d C:/Logo_AUT_CLRv2_baseColor.png
