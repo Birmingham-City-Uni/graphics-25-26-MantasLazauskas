@@ -1,57 +1,6 @@
 # Blender 5.1.1 MTL File: 'pathtraced.blend'
 # www.blender.org
 
-newmtl ALT_Grimlock_TEXSET_D
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/ALT_Grimlock_TEXSET_D_baseColor.png
-map_Ke C:/ALT_Grimlock_TEXSET_D_emissive.png
-map_Bump -bm 1.000000 C:/ALT_Grimlock_TEXSET_D_normal.png
-
-newmtl FOC_Background
-Ns 360.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
-illum 2
-
-newmtl Logo_AUT_CLRv2
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-illum 3
-map_Kd C:/Logo_AUT_CLRv2_baseColor.png
-map_Ke C:/Logo_AUT_CLRv2_emissive.png
-map_d C:/Logo_AUT_CLRv2_baseColor.png
-
-newmtl Material
-Ns 360.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
-illum 2
-
-newmtl Material.001
-Ns 360.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
-illum 2
-
 newmtl Material_003
 Ns 12.500003
 Ka 1.000000 1.000000 1.000000
@@ -61,127 +10,6 @@ Ni 1.500000
 d 1.000000
 illum 2
 map_Kd C:/Material_003_baseColor.png
-
-newmtl RB_BumbleBee_ArmUp_Cust_MatINST
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_BumbleBee_ArmUp_Cust_MatINST_baseColor.png
-map_Ke C:/RB_BumbleBee_ArmUp_Cust_MatINST_emissive.png
-map_Bump -bm 1.000000 C:/RB_BumbleBee_ArmUp_Cust_MatINST_normal.png
-
-newmtl RB_BumbleBee_Chest_Cust_MatINST
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_BumbleBee_Chest_Cust_MatINST_baseColor.png
-map_Ke C:/RB_BumbleBee_Chest_Cust_MatINST_emissive.png
-map_Bump -bm 1.000000 C:/RB_BumbleBee_Chest_Cust_MatINST_normal.png
-
-newmtl RB_BumbleBee_Head_Cust_MatINST
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_BumbleBee_Head_Cust_MatINST_baseColor.png
-map_Ke C:/RB_BumbleBee_Head_Cust_MatINST_emissive.png
-map_Bump -bm 1.000000 C:/RB_BumbleBee_Head_Cust_MatINST_normal.png
-
-newmtl RB_BumbleBee_Legs_Cust_MatINST
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_BumbleBee_Legs_Cust_MatINST_baseColor.png
-map_Ke C:/RB_BumbleBee_Legs_Cust_MatINST_emissive.png
-map_Bump -bm 1.000000 C:/RB_BumbleBee_Legs_Cust_MatINST_normal.png
-
-newmtl RB_BumbleBee_Wheel_Cust_MatINST_INST
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_BumbleBee_Wheel_Cust_MatINST_INST_baseColor.png
-map_Bump -bm 1.000000 C:/RB_BumbleBee_Wheel_Cust_MatINST_INST_normal.png
-
-newmtl RB_Metro_Greeble_Mat_INST.001
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_Metro_Greeble_Mat_INST_baseColor.png
-map_Bump -bm 1.000000 C:/RB_Metro_Greeble_Mat_INST_normal.png
-
-newmtl RB_MetroplexArmLo_MatInst.001
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_MetroplexArmLo_MatInst_baseColor.png
-map_Ke C:/RB_MetroplexArmLo_MatInst_emissive.png
-map_Bump -bm 1.000000 C:/RB_MetroplexArmLo_MatInst_normal.png
-
-newmtl RB_MetroplexArmUp_MatInst.001
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_MetroplexArmUp_MatInst_baseColor.png
-map_Ke C:/RB_MetroplexArmUp_MatInst_emissive.png
-map_Bump -bm 1.000000 C:/RB_MetroplexArmUp_MatInst_normal.png
-
-newmtl RB_MetroplexChest_MatInst.001
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_MetroplexChest_MatInst_baseColor.png
-map_Ke C:/RB_MetroplexChest_MatInst_emissive.png
-map_Bump -bm 1.000000 C:/RB_MetroplexChest_MatInst_normal.png
-
-newmtl RB_MetroplexHead_MatInst.001
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_MetroplexHead_MatInst_baseColor.png
-map_Ke C:/RB_MetroplexHead_MatInst_emissive.png
-map_Bump -bm 1.000000 C:/RB_MetroplexHead_MatInst_normal.png
-
-newmtl RB_MetroplexLegs_MatInst.001
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/RB_MetroplexLegs_MatInst_baseColor.png
-map_Ke C:/RB_MetroplexLegs_MatInst_emissive.png
-map_Bump -bm 1.000000 C:/RB_MetroplexLegs_MatInst_normal.png
 
 newmtl RB_Optimus_ArmLo_Mat
 Ns 562.500000
@@ -259,26 +87,6 @@ map_Kd C:/TR_FactionLogo_Mat_INST_baseColor.png
 map_Ke C:/TR_FactionLogo_Mat_INST_emissive.png
 map_d C:/TR_FactionLogo_Mat_INST_baseColor.png
 
-newmtl TR_FactionLogo_Mat_INST.001
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ni 1.500000
-illum 1
-map_Kd C:/TR_FactionLogo_Mat_INST_baseColor.png
-map_Ke C:/TR_FactionLogo_Mat_INST_emissive.png
-map_d C:/TR_FactionLogo_Mat_INST_baseColor.png
-
-newmtl TR_FactionLogo_Mat_INST.003
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-illum 3
-map_Kd C:/TR_FactionLogo_Mat_INST_baseColor.png
-map_Ke C:/TR_FactionLogo_Mat_INST_emissive.png
-map_d C:/TR_FactionLogo_Mat_INST_baseColor.png
-
 newmtl material001
 Ns 1.767767
 Ka 1.000000 1.000000 1.000000
@@ -288,14 +96,3 @@ Ni 1.500000
 d 1.000000
 illum 2
 map_Kd C:/material001_baseColor.png
-
-newmtl material_0
-Ns 562.500000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd C:/material_0_baseColor.png
-map_Ke C:/material_0_emissive.png
-map_Bump -bm 1.000000 C:/material_0_normal.png
