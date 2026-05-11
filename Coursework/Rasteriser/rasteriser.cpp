@@ -475,7 +475,7 @@ int main()
             Vec3 e1 = sB - sA, e2 = sC - sA;
             float cz = e1.x * e2.y - e1.y * e2.x;
             // Back-face culling: skip triangles facing away
-            if(cz <= 0.0f) continue;
+            // if(cz <= 0.0f) continue;
 
             int minX = std::max(0, (int)std::floor(std::min(std::min(sA.x, sB.x), sC.x)));
             int minY = std::max(0, (int)std::floor(std::min(std::min(sA.y, sB.y), sC.y)));
